@@ -5,7 +5,7 @@ import ProductCard from '../components/ProductCard';
 import axios from 'axios';
 import './Home.css';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://par-back.onrender.com/api';
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
