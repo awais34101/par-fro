@@ -9,12 +9,14 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentImageSlide, setCurrentImageSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Dynamic content from API
+  const [imageSlideshow, setImageSlideshow] = useState([]);
   const [heroSlides, setHeroSlides] = useState([]);
   const [deal, setDeal] = useState(null);
   const [promoBanners, setPromoBanners] = useState([]);
@@ -25,6 +27,15 @@ const Home = () => {
     fetchHomeContent();
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (imageSlideshow.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentImageSlide((prev) => (prev + 1) % imageSlideshow.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [imageSlideshow]);
 
   useEffect(() => {
     if (heroSlides.length > 0) {
@@ -59,10 +70,16 @@ const Home = () => {
       const response = await axios.get(`${API_URL}/home-content`);
       const data = response.data;
       
+      console.log('Home content data:', data);
+      console.log('Image slideshow:', data.imageSlideshow);
+      
+      setImageSlideshow(data.imageSlideshow?.filter(slide => slide.isActive) || []);
       setHeroSlides(data.heroSlides?.filter(slide => slide.isActive) || []);
       setDeal(data.deal?.isActive ? data.deal : null);
       setPromoBanners(data.promoBanners?.filter(banner => banner.isActive) || []);
       setCategoryShowcase(data.categoryShowcase?.filter(cat => cat.isActive) || []);
+      
+      console.log('Image slideshow after filter:', data.imageSlideshow?.filter(slide => slide.isActive));
     } catch (error) {
       console.error('Error fetching home content:', error);
       // Set default content if API fails
@@ -101,6 +118,40 @@ const Home = () => {
 
   return (
     <div className="home">
+      {/* Image Slideshow Section */}
+      {console.log('Image slideshow length:', imageSlideshow.length)}
+      {console.log('Image slideshow data:', imageSlideshow)}
+      {imageSlideshow.length > 0 ? (
+        <section className="image-slideshow">
+          {imageSlideshow.map((slide, index) => (
+            <div
+              key={index}
+              className={`slideshow-image ${index === currentImageSlide ? 'active' : ''}`}
+              style={{ 
+                backgroundImage: `url(${slide.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            />
+          ))}
+          {imageSlideshow.length > 1 && (
+            <div className="slideshow-indicators">
+              {imageSlideshow.map((_, index) => (
+                <button
+                  key={index}
+                  className={index === currentImageSlide ? 'active' : ''}
+                  onClick={() => setCurrentImageSlide(index)}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      ) : (
+        <div style={{padding: '20px', background: '#f0f0f0', textAlign: 'center'}}>
+          No images in slideshow. Please add images in Admin Panel.
+        </div>
+      )}
+
       {/* Hero Carousel */}
       <section className="hero-carousel">
         {heroSlides.map((slide, index) => (
