@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiUser, FiLogOut, FiPackage, FiHeart } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiPackage, FiHeart } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -87,9 +87,6 @@ const Navbar = () => {
               <Link to="/profile" className="nav-icon" title="Profile">
                 <FiUser size={24} />
               </Link>
-              <button onClick={logout} className="nav-icon logout-btn" title="Logout">
-                <FiLogOut size={24} />
-              </button>
             </>
           ) : (
             <Link to="/login" className="btn btn-primary">
