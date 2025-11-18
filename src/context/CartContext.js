@@ -7,21 +7,30 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState({ items: [] });
   const [loading, setLoading] = useState(false);
+  const [lastFetch, setLastFetch] = useState(null);
   const { user } = useContext(AuthContext);
+  const CACHE_TIME = 30000; // 30 seconds cache
 
   useEffect(() => {
     if (user) {
       fetchCart();
     } else {
       setCart({ items: [] });
+      setLastFetch(null);
     }
   }, [user]);
 
-  const fetchCart = async () => {
+  const fetchCart = async (force = false) => {
+    // Skip if recently fetched (unless forced)
+    if (!force && lastFetch && Date.now() - lastFetch < CACHE_TIME) {
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await cartAPI.getCart();
       setCart(response.data.data);
+      setLastFetch(Date.now());
     } catch (error) {
       console.error('Error fetching cart:', error);
     } finally {

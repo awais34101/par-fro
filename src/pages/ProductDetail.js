@@ -9,6 +9,10 @@ import ProductReviews from '../components/ProductReviews';
 import { toast } from 'react-toastify';
 import './ProductDetail.css';
 
+// Product cache to avoid refetching
+const productCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -27,8 +31,25 @@ const ProductDetail = () => {
   const fetchProduct = async () => {
     try {
       setLoading(true);
+      
+      // Check cache first
+      const cached = productCache.get(id);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        setProduct(cached.data);
+        setLoading(false);
+        return;
+      }
+
       const response = await productsAPI.getById(id);
-      setProduct(response.data.data);
+      const productData = response.data.data;
+      
+      // Cache the result
+      productCache.set(id, {
+        data: productData,
+        timestamp: Date.now()
+      });
+      
+      setProduct(productData);
     } catch (err) {
       setError('Failed to fetch product details');
     } finally {

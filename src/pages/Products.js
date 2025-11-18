@@ -6,6 +6,10 @@ import { AuthContext } from '../context/AuthContext';
 import ProductCard from '../components/ProductCard';
 import './Products.css';
 
+// Products cache
+const productsCache = new Map();
+const CACHE_DURATION = 3 * 60 * 1000; // 3 minutes
+
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,6 +28,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const fetchProducts = async () => {
@@ -36,8 +41,26 @@ const Products = () => {
       if (filters.minPrice) params.minPrice = filters.minPrice;
       if (filters.maxPrice) params.maxPrice = filters.maxPrice;
 
+      // Create cache key from params
+      const cacheKey = JSON.stringify(params);
+      const cached = productsCache.get(cacheKey);
+      
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+        setProducts(cached.data);
+        setLoading(false);
+        return;
+      }
+
       const response = await productsAPI.getAll(params);
-      setProducts(response.data.data);
+      const productsData = response.data.data;
+      
+      // Cache the results
+      productsCache.set(cacheKey, {
+        data: productsData,
+        timestamp: Date.now()
+      });
+      
+      setProducts(productsData);
       setError('');
     } catch (err) {
       setError('Failed to fetch products');
