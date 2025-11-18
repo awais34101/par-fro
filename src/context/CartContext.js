@@ -78,9 +78,12 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = async () => {
+    // Optimistically clear the cart UI immediately
+    setCart({ items: [] });
+    
     try {
-      await cartAPI.clearCart();
-      setCart({ items: [] });
+      // Send request to backend but don't wait for it
+      cartAPI.clearCart().catch(err => console.error('Cart clear error:', err));
       return { success: true };
     } catch (error) {
       return {

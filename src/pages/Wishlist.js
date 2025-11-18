@@ -28,6 +28,8 @@ const Wishlist = () => {
     const result = await addToCart(product._id, 1);
     if (result.success) {
       toast.success('Added to cart!');
+      // Auto remove from wishlist after adding to cart
+      await removeFromWishlist(product._id);
     } else {
       toast.error(result.message);
     }

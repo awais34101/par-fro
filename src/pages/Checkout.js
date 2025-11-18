@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { ordersAPI } from '../services/api';
+import { toast } from 'react-toastify';
 import './Checkout.css';
 
 const Checkout = () => {
@@ -73,11 +74,18 @@ const Checkout = () => {
       };
 
       const response = await ordersAPI.create(orderData);
-      await clearCart();
-      alert('Order placed successfully!');
-      navigate(`/orders`);
+      
+      // Clear cart immediately without waiting
+      clearCart();
+      
+      toast.success('Order placed successfully! 🎉');
+      
+      // Navigate immediately
+      navigate('/orders', { replace: true });
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to place order');
+      const errorMsg = err.response?.data?.message || 'Failed to place order';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

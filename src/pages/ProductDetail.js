@@ -67,6 +67,10 @@ const ProductDetail = () => {
     const result = await addToCart(product._id, quantity);
     if (result.success) {
       toast.success('Product added to cart!');
+      // Auto remove from wishlist if it's there
+      if (isInWishlist(product._id)) {
+        await removeFromWishlist(product._id);
+      }
     } else {
       toast.error(result.message);
     }
