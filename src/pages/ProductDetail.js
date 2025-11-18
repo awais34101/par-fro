@@ -58,6 +58,9 @@ const ProductDetail = () => {
       return;
     }
 
+    console.log('Toggling wishlist for product:', product._id);
+    console.log('Currently in wishlist:', isInWishlist(product._id));
+
     if (isInWishlist(product._id)) {
       const result = await removeFromWishlist(product._id);
       if (result.success) {

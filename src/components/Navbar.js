@@ -1,8 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingCart, FiUser, FiLogOut, FiPackage } from 'react-icons/fi';
+import { FiShoppingCart, FiUser, FiLogOut, FiPackage, FiHeart } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
+import { WishlistContext } from '../context/WishlistContext';
 import axios from 'axios';
 import './Navbar.css';
 
@@ -11,6 +12,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://par-back.onrender.com/
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const { getCartCount } = useContext(CartContext);
+  const { getWishlistCount } = useContext(WishlistContext);
   // Load from localStorage immediately to avoid flash
   const [storeName, setStoreName] = useState(
     localStorage.getItem('storeName') || 'Luxe Perfumes'
@@ -73,6 +75,12 @@ const Navbar = () => {
 
           {user ? (
             <>
+              <Link to="/wishlist" className="nav-icon" title="My Wishlist">
+                <FiHeart size={24} />
+                {getWishlistCount() > 0 && (
+                  <span className="cart-badge">{getWishlistCount()}</span>
+                )}
+              </Link>
               <Link to="/orders" className="nav-icon" title="My Orders">
                 <FiPackage size={24} />
               </Link>

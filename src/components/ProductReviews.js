@@ -17,6 +17,8 @@ const ProductReviews = ({ productId }) => {
     comment: ''
   });
 
+  console.log('ProductReviews component mounted for product:', productId);
+
   useEffect(() => {
     fetchReviews();
   }, [productId]);

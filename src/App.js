@@ -17,6 +17,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
+import Wishlist from './pages/Wishlist';
 import PrivateRoute from './components/PrivateRoute';
 import './App.css';
 
@@ -74,6 +75,14 @@ function App() {
                     element={
                       <PrivateRoute>
                         <Orders />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route
+                    path="/wishlist"
+                    element={
+                      <PrivateRoute>
+                        <Wishlist />
                       </PrivateRoute>
                     }
                   />

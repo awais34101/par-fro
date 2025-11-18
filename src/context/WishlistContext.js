@@ -10,16 +10,24 @@ export const WishlistProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [wishlist, setWishlist] = useState({ products: [] });
   const [loading, setLoading] = useState(false);
+  const [lastFetch, setLastFetch] = useState(null);
+  const CACHE_TIME = 60000; // 1 minute cache
 
   useEffect(() => {
     if (user) {
       fetchWishlist();
     } else {
       setWishlist({ products: [] });
+      setLastFetch(null);
     }
   }, [user]);
 
-  const fetchWishlist = async () => {
+  const fetchWishlist = async (force = false) => {
+    // Skip if recently fetched (unless forced)
+    if (!force && lastFetch && Date.now() - lastFetch < CACHE_TIME) {
+      return;
+    }
+
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -27,6 +35,7 @@ export const WishlistProvider = ({ children }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setWishlist(response.data.data);
+      setLastFetch(Date.now());
     } catch (error) {
       console.error('Error fetching wishlist:', error);
     } finally {
