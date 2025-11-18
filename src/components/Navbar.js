@@ -11,20 +11,43 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://par-back.onrender.com/
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const { getCartCount } = useContext(CartContext);
-  const [storeName, setStoreName] = useState('Luxe Perfumes');
+  // Load from localStorage immediately to avoid flash
+  const [storeName, setStoreName] = useState(
+    localStorage.getItem('storeName') || 'Luxe Perfumes'
+  );
 
   useEffect(() => {
     fetchStoreName();
+    
+    // Listen for store name updates
+    const handleStoreNameUpdate = (event) => {
+      setStoreName(event.detail);
+    };
+    
+    window.addEventListener('storeNameUpdated', handleStoreNameUpdate);
+    
+    return () => {
+      window.removeEventListener('storeNameUpdated', handleStoreNameUpdate);
+    };
   }, []);
 
   const fetchStoreName = async () => {
     try {
       const response = await axios.get(`${API_URL}/settings`);
-      if (response.data.storeName) {
+      console.log('Settings response:', response.data);
+      // The API returns settings directly, not wrapped in data
+      if (response.data && response.data.storeName) {
         setStoreName(response.data.storeName);
+        // Also store in localStorage for quick access
+        localStorage.setItem('storeName', response.data.storeName);
       }
     } catch (error) {
       console.error('Error fetching store name:', error);
+      // Try to get from localStorage as fallback
+      const cached = localStorage.getItem('storeName');
+      if (cached) {
+        setStoreName(cached);
+      }
     }
   };
 

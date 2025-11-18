@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiShoppingCart, FiStar } from 'react-icons/fi';
+import { FiShoppingCart, FiStar, FiHeart } from 'react-icons/fi';
 import { productsAPI } from '../services/api';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
+import { WishlistContext } from '../context/WishlistContext';
+import ProductReviews from '../components/ProductReviews';
+import { toast } from 'react-toastify';
 import './ProductDetail.css';
 
 const ProductDetail = () => {
@@ -15,6 +18,7 @@ const ProductDetail = () => {
   const [error, setError] = useState('');
   const { addToCart } = useContext(CartContext);
   const { user } = useContext(AuthContext);
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
 
   useEffect(() => {
     fetchProduct();
@@ -34,17 +38,40 @@ const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!user) {
-      alert('Please login to add items to cart');
+      toast.error('Please login to add items to cart');
       navigate('/login');
       return;
     }
 
     const result = await addToCart(product._id, quantity);
     if (result.success) {
-      alert('Product added to cart!');
-      navigate('/cart');
+      toast.success('Product added to cart!');
     } else {
-      alert(result.message);
+      toast.error(result.message);
+    }
+  };
+
+  const handleWishlistToggle = async () => {
+    if (!user) {
+      toast.error('Please login to add to wishlist');
+      navigate('/login');
+      return;
+    }
+
+    if (isInWishlist(product._id)) {
+      const result = await removeFromWishlist(product._id);
+      if (result.success) {
+        toast.success('Removed from wishlist');
+      } else {
+        toast.error(result.message);
+      }
+    } else {
+      const result = await addToWishlist(product._id);
+      if (result.success) {
+        toast.success('Added to wishlist!');
+      } else {
+        toast.error(result.message);
+      }
     }
   };
 
@@ -112,6 +139,14 @@ const ProductDetail = () => {
             </div>
 
             <div className="product-actions">
+              <button
+                className={`btn-wishlist ${isInWishlist(product._id) ? 'active' : ''}`}
+                onClick={handleWishlistToggle}
+                title={isInWishlist(product._id) ? 'Remove from wishlist' : 'Add to wishlist'}
+              >
+                <FiHeart fill={isInWishlist(product._id) ? 'currentColor' : 'none'} />
+              </button>
+
               <div className="quantity-selector">
                 <label>Quantity:</label>
                 <div className="quantity-controls">
@@ -148,6 +183,9 @@ const ProductDetail = () => {
             </div>
           </div>
         </div>
+
+        {/* Product Reviews Section */}
+        <ProductReviews productId={product._id} />
       </div>
     </div>
   );

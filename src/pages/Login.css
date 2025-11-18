@@ -53,6 +53,66 @@
   text-decoration: underline;
 }
 
+.auth-divider {
+  position: relative;
+  text-align: center;
+  margin: 30px 0;
+}
+
+.auth-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e0e0e0;
+}
+
+.auth-divider span {
+  position: relative;
+  padding: 0 15px;
+  background: white;
+  color: var(--light-text);
+  font-size: 14px;
+}
+
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.btn-apple {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  background: #000;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-apple:hover:not(:disabled) {
+  background: #333;
+}
+
+.btn-apple:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-apple svg {
+  fill: white;
+}
+
 @media (max-width: 768px) {
   .auth-card {
     padding: 30px 20px;

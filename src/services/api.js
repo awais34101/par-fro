@@ -27,6 +27,8 @@ api.interceptors.request.use(
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
+  googleAuth: (credential) => api.post('/auth/google', credential),
+  appleAuth: (authData) => api.post('/auth/apple', authData),
   getProfile: () => api.get('/auth/profile'),
   updateProfile: (userData) => api.put('/auth/profile', userData)
 };
